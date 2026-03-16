@@ -6,7 +6,8 @@ const hasMediaSrc = (value?: string | null): value is string =>
 import { motion, AnimatePresence } from 'motion/react';
 import { AlertTriangle, Zap, ChevronRight, BookOpen, EyeOff, X, Mic } from 'lucide-react';
 import { storyPacks, StoryPack, PlayerId } from './storyPacks';
-import { generateTurnText, generateImageOnly, compileSceneVisualBrief, buildImagePromptFromBrief, generateCharacterCanon, buildCastTable, CastTable, DebugInfo, generateCoverImage, translateStory } from './server/gemini';
+import { buildCastTable, CastTable, DebugInfo } from './geminiShared';
+import { generateTurnTextApi, generateImageApi, generateCoverApi, characterCanonApi, translateApi } from './services/api';
 import { useGameState, useSocketGameState, createSocketRoom } from './store';
 import { GameState, TurnData, Panel } from './types';
 import { applyTurnImpact, buildTurnImpact, INITIAL_OUTCOME_FIELDS } from './outcomeEngine';
@@ -141,7 +142,7 @@ function LibraryView({ onSelect }: { onSelect: (story: StoryPack) => void }) {
           if (!localStorage.getItem(`cover_v2_${story.id}`)) {
             const prompt = getPromptForStory(story.id);
             if (prompt) {
-              const newCover = await generateCoverImage(prompt);
+              const newCover = await generateCoverApi(prompt);
               if (newCover) {
                 localStorage.setItem(`cover_v2_${story.id}`, newCover);
                 setStories(prev => prev.map(s => s.id === story.id ? { ...s, coverUrl: newCover } : s));
@@ -959,11 +960,11 @@ function DuelView({ sessionId, playerId, token }: { sessionId: string, playerId:
   // Generate character canon once per story (before early returns to satisfy Rules of Hooks)
   useEffect(() => {
     if (!story) return;
-    generateCharacterCanon(
-      story.characterIdentityLock,
-      story.playerA.defaultName,
-      story.playerB.defaultName,
-    ).then(canon => {
+    characterCanonApi({
+      characterIdentityLock: story.characterIdentityLock,
+      playerAName: story.playerA.defaultName,
+      playerBName: story.playerB.defaultName,
+    }).then(canon => {
       castTableRef.current = buildCastTable(canon, story.playerA.defaultName, story.playerB.defaultName);
     });
   }, [story?.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -1132,20 +1133,21 @@ function DuelView({ sessionId, playerId, token }: { sessionId: string, playerId:
     const composed = composeIntentText(bodyOverride);
     const history = gameState.storyboard.map(c => `Turn ${c.turn} (${c.player}): ${c.text}`).join('\n\n');
 
-    // Step 1: Generate scene text
-    const { textResult, usedTextModel, textError } = await generateTurnText(
-      history, playerId, composed, gameState.progressA,
-      story.characterIdentityLock, story.visualStyleLock,
-      gameState.credibility, gameState.evidenceState,
-      gameState.mediaState, gameState.trustState, story.anchors,
-      gameState.sideQuestEarned[playerId],
-      gameState.currentTurn,
+    // Step 1: Generate scene text + image prompt via server
+    const { textResult, imagePrompt: serverImagePrompt, usedTextModel, textError } = await generateTurnTextApi({
+      history, playerId, intentText: composed, progressA: gameState.progressA,
+      characterLock: story.characterIdentityLock, styleLock: story.visualStyleLock,
+      credibility: gameState.credibility, evidenceState: gameState.evidenceState,
+      mediaState: gameState.mediaState, trustState: gameState.trustState, anchors: story.anchors,
+      sideQuestAlreadyEarned: gameState.sideQuestEarned[playerId],
+      currentTurn: gameState.currentTurn,
       // Code-level guard: intentScale is 'FINAL' only when both conditions are true.
       // Turn 10 without amplified/lock phase gets 'NORMAL' — model never sees FINAL.
-      (gameState.currentTurn === 10 &&
+      intentScale: (gameState.currentTurn === 10 &&
         (gameState.outcome.phase === 'amplified' || gameState.outcome.phase === 'lock'))
-        ? 'FINAL' : 'NORMAL'
-    );
+        ? 'FINAL' : 'NORMAL',
+      castTable: castTableRef.current,
+    });
 
     // Step 2: Show card immediately with text, panels empty
     const cardId = `turn-${gameState.currentTurn}`;
@@ -1158,20 +1160,10 @@ function DuelView({ sessionId, playerId, token }: { sessionId: string, playerId:
     };
     setInProgressCard(partial);
 
-    // Step 3a: Distil prose into a structured visual brief (no abstract plot,
-    // no internal thoughts, no off-screen events).
-    const brief = await compileSceneVisualBrief(textResult.sceneText, castTableRef.current);
-
-    // Step 3b: Build the final image prompt strictly from the brief.
-    // The brief is the sole authority for camera and character names —
-    // no external overrides are applied here.
-    const imagePrompt = buildImagePromptFromBrief(brief, story.visualStyleLock, castTableRef.current);
-
     // ── [IMAGE DEBUG] ────────────────────────────────────────────────────────
     console.group(`[IMAGE DEBUG] Turn ${partial.turn}`);
     console.log('[IMAGE DEBUG] raw sceneText\n', textResult.sceneText);
-    console.log('[IMAGE DEBUG] visual brief\n', JSON.stringify(brief, null, 2));
-    console.log('[IMAGE DEBUG] final imagePrompt\n', imagePrompt);
+    console.log('[IMAGE DEBUG] final imagePrompt\n', serverImagePrompt);
     console.groupEnd();
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -1180,7 +1172,7 @@ function DuelView({ sessionId, playerId, token }: { sessionId: string, playerId:
     let lastImageModel = 'placeholder';
 
     {
-      const { imageUrl, usedImageModel, imageError, imageFailed } = await generateImageOnly(imagePrompt);
+      const { imageUrl, usedImageModel, imageError, imageFailed } = await generateImageApi(serverImagePrompt);
       const panel: Panel = {
         imageUrl: imageFailed ? `https://picsum.photos/seed/${encodeURIComponent(textResult.sceneText.slice(0, 40))}/400/300?grayscale` : imageUrl,
         caption: textResult.sceneText,
@@ -1423,7 +1415,7 @@ function DuelView({ sessionId, playerId, token }: { sessionId: string, playerId:
               setIsTranslating(true);
               let ok = false;
               try {
-                const map = await translateStory(missing);
+                const map = await translateApi(missing);
                 if (Object.keys(map).length > 0) {
                   setTranslatedTexts(prev => ({ ...prev, ...map }));
                   ok = true;

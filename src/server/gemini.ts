@@ -8,7 +8,7 @@ const getApiKey = () => {
   return undefined;
 };
 
-const rawApiKey = (getApiKey() || import.meta.env.VITE_GEMINI_API_KEY)?.trim().replace(/^["']|["']$/g, '');
+const rawApiKey = (getApiKey() || import.meta.env?.VITE_GEMINI_API_KEY)?.trim().replace(/^["']|["']$/g, '');
 const apiKey = (!rawApiKey || rawApiKey === 'undefined' || rawApiKey === 'null' || rawApiKey === 'MY_GEMINI_API_KEY') ? undefined : rawApiKey;
 const ai = new GoogleGenAI({ apiKey: apiKey || 'mock' });
 
@@ -372,7 +372,7 @@ Please perform the following actions and return JSON:
 
   if (apiKey && apiKey !== 'mock') {
     const textCandidates = [
-      import.meta.env.VITE_GEMINI_TEXT_MODEL,
+      import.meta.env?.VITE_GEMINI_TEXT_MODEL,
       cachedTextModel,
       'gemini-3-flash-preview',
       'gemini-3.1-pro-preview'
@@ -779,7 +779,7 @@ Return a JSON object with these exact fields:
   };
 
   const candidates = [
-    import.meta.env.VITE_GEMINI_TEXT_MODEL,
+    import.meta.env?.VITE_GEMINI_TEXT_MODEL,
     cachedTextModel,
     'gemini-3-flash-preview',
     'gemini-2.5-flash-preview-05-20',
@@ -877,7 +877,7 @@ Return a JSON array of character canon objects.`;
   };
 
   const candidates = [
-    import.meta.env.VITE_GEMINI_TEXT_MODEL,
+    import.meta.env?.VITE_GEMINI_TEXT_MODEL,
     cachedTextModel,
     'gemini-3-flash-preview',
     'gemini-2.5-flash-preview-05-20',
@@ -917,7 +917,7 @@ export async function generateImageOnly(imagePrompt: string): Promise<{ imageUrl
 
   if (apiKey && apiKey !== 'mock' && imagePrompt) {
     const imageCandidates = [
-      import.meta.env.VITE_GEMINI_IMAGE_MODEL,
+      import.meta.env?.VITE_GEMINI_IMAGE_MODEL,
       cachedImageModel,
       'gemini-2.5-flash-image',
       'gemini-3.1-flash-image-preview'
@@ -1085,7 +1085,7 @@ export async function translateStory(texts: string[]): Promise<Record<string, st
   const prompt = `Translate each story passage below into Simplified Chinese (简体中文). Return a JSON array of translated strings in the same order. Passage count: ${texts.length}.\n\n${texts.map((t, i) => `[${i}] ${t}`).join('\n\n')}`;
 
   const candidates = [
-    import.meta.env.VITE_GEMINI_TEXT_MODEL,
+    import.meta.env?.VITE_GEMINI_TEXT_MODEL,
     cachedTextModel,
     'gemini-3-flash-preview',
     'gemini-3.1-pro-preview',

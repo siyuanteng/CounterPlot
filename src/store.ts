@@ -6,9 +6,14 @@ import { GameState } from './types';
 //  Socket multiplayer — Step 2
 // ─────────────────────────────────────────────────────────────────────────────
 
+// In dev, Vite runs on a different port than the backend — connect Socket.IO directly
+// to the backend using the port from .env (exposed as VITE_BACKEND_PORT by vite.config.ts).
+// In production, frontend and backend are the same server (same origin).
 const SERVER_URL =
   (import.meta.env.VITE_SERVER_URL as string | undefined) ||
-  `${window.location.protocol}//${window.location.hostname}:3001`;
+  (import.meta.env.DEV
+    ? `${window.location.protocol}//${window.location.hostname}:${import.meta.env.VITE_BACKEND_PORT || '3001'}`
+    : window.location.origin);
 
 export interface Presence {
   A: boolean;

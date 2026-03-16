@@ -5,11 +5,13 @@ import {defineConfig, loadEnv} from 'vite';
 
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
+  const backendPort = env.PORT || '3001';
+  const backendUrl = `http://localhost:${backendPort}`;
   return {
     plugins: [react(), tailwindcss()],
     define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'process.env.API_KEY': JSON.stringify(env.API_KEY),
+      // Expose backend port to frontend so store.ts can connect directly in dev
+      'import.meta.env.VITE_BACKEND_PORT': JSON.stringify(backendPort),
     },
     resolve: {
       alias: {
@@ -22,8 +24,13 @@ export default defineConfig(({mode}) => {
       hmr: process.env.DISABLE_HMR !== 'true',
       host: '0.0.0.0', // allow LAN access
       proxy: {
-        '/api': 'http://localhost:3001',
-        '/generated': 'http://localhost:3001',
+        '/api': backendUrl,
+        '/generated': backendUrl,
+        '/socket.io': {
+          target: backendUrl,
+          ws: true,
+          changeOrigin: true,
+        },
       },
     },
   };

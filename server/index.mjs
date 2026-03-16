@@ -3,14 +3,26 @@ import cors from "cors";
 import dotenv from "dotenv";
 import fs from "node:fs";
 import path from "node:path";
-import { startMotionClip, jobs as veoJobs } from "./veo.mjs";
 import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
 import { randomBytes } from "node:crypto";
 import { GoogleGenAI } from "@google/genai";
 import { Server } from "socket.io";
 
+// dotenv MUST run before gemini.ts is imported — gemini reads process.env at module init.
 dotenv.config();
+
+// Dynamic imports so process.env is populated before gemini.ts module code runs.
+const { startMotionClip, jobs: veoJobs } = await import("./veo.mjs");
+const {
+  generateTurnText,
+  compileSceneVisualBrief,
+  buildImagePromptFromBrief,
+  generateImageOnly,
+  generateCharacterCanon,
+  generateCoverImage,
+  translateStory,
+} = await import("../src/server/gemini.ts");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,7 +34,7 @@ if (!fs.existsSync(generatedDir)) {
 }
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -130,6 +142,108 @@ app.post("/api/generate-still", async (req, res) => {
       error: "Failed to generate still image",
       detail: error?.message || String(error),
     });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Gemini AI routes — key lives only here, never in the frontend bundle
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** POST /api/generate-turn-text
+ *  Runs generateTurnText → compileSceneVisualBrief → buildImagePromptFromBrief.
+ *  Returns { textResult, imagePrompt, usedTextModel, textError }.
+ */
+app.post("/api/generate-turn-text", async (req, res) => {
+  try {
+    const {
+      history, playerId, intentText, progressA,
+      characterLock, styleLock, credibility,
+      evidenceState, mediaState, trustState,
+      anchors, sideQuestAlreadyEarned, currentTurn, intentScale,
+      castTable,
+    } = req.body;
+
+    const { textResult, usedTextModel, textError } = await generateTurnText(
+      history, playerId, intentText, progressA,
+      characterLock, styleLock, credibility,
+      evidenceState, mediaState, trustState,
+      anchors, sideQuestAlreadyEarned, currentTurn, intentScale,
+    );
+
+    const brief = await compileSceneVisualBrief(textResult.sceneText, castTable);
+    const imagePrompt = buildImagePromptFromBrief(brief, styleLock, castTable);
+
+    return res.json({ textResult, imagePrompt, usedTextModel, textError });
+  } catch (err) {
+    console.error("[generate-turn-text] failed:", err);
+    return res.status(500).json({ error: err?.message || String(err) });
+  }
+});
+
+/** POST /api/generate-image
+ *  Runs generateImageOnly(imagePrompt).
+ *  Returns { imageUrl, usedImageModel, imageError, imageFailed }.
+ */
+app.post("/api/generate-image", async (req, res) => {
+  try {
+    const { imagePrompt } = req.body;
+    if (!imagePrompt || typeof imagePrompt !== "string") {
+      return res.status(400).json({ error: "imagePrompt is required" });
+    }
+    const result = await generateImageOnly(imagePrompt);
+    return res.json(result);
+  } catch (err) {
+    console.error("[generate-image] failed:", err);
+    return res.status(500).json({ error: err?.message || String(err) });
+  }
+});
+
+/** POST /api/generate-cover
+ *  Returns { imageUrl: string | null }.
+ */
+app.post("/api/generate-cover", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt || typeof prompt !== "string") {
+      return res.status(400).json({ error: "prompt is required" });
+    }
+    const imageUrl = await generateCoverImage(prompt);
+    return res.json({ imageUrl });
+  } catch (err) {
+    console.error("[generate-cover] failed:", err);
+    return res.status(500).json({ error: err?.message || String(err) });
+  }
+});
+
+/** POST /api/character-canon
+ *  Returns { canon: Record<string, CharacterCanon> }.
+ */
+app.post("/api/character-canon", async (req, res) => {
+  try {
+    const { characterIdentityLock, playerAName, playerBName } = req.body;
+    const canon = await generateCharacterCanon(characterIdentityLock, playerAName, playerBName);
+    return res.json({ canon });
+  } catch (err) {
+    console.error("[character-canon] failed:", err);
+    return res.status(500).json({ error: err?.message || String(err) });
+  }
+});
+
+/** POST /api/translate
+ *  Body: { texts: string[] }
+ *  Returns { translations: Record<string, string> }.
+ */
+app.post("/api/translate", async (req, res) => {
+  try {
+    const { texts } = req.body;
+    if (!Array.isArray(texts)) {
+      return res.status(400).json({ error: "texts must be an array" });
+    }
+    const translations = await translateStory(texts);
+    return res.json({ translations });
+  } catch (err) {
+    console.error("[translate] failed:", err);
+    return res.status(500).json({ error: err?.message || String(err) });
   }
 });
 
@@ -343,7 +457,20 @@ io.on("connection", (socket) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+//  Static frontend (production) — serve dist/ and fall back to index.html for SPA
+// ─────────────────────────────────────────────────────────────────────────────
 
-httpServer.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+const distDir = path.join(rootDir, "dist");
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+  // SPA fallback: any non-API route returns index.html
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(distDir, "index.html"));
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+httpServer.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`);
 });
