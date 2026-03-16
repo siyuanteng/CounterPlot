@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" width="1100" height="520"
+     font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 L2,4 Z" fill="#9090b8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="520" fill="white"/>
+
+  <!-- TITLE -->
+  <text x="550" y="28" text-anchor="middle" font-size="18" font-weight="700" fill="#12102a">CounterPlot Architecture</text>
+  <text x="550" y="44" text-anchor="middle" font-size="10" fill="#5858a0" font-style="italic">Turn-based competitive narrative engine · Structured intent · Multimodal generation</text>
+
+  <!-- ======== TOP BAND ======== -->
+  <rect x="30" y="56" width="1040" height="52" rx="10" fill="#f0ecfc" stroke="#c0b0ea" stroke-width="1.5"/>
+
+  <rect x="50"  y="68" width="128" height="28" rx="14" fill="#ddd8f5" stroke="#a090d0" stroke-width="1"/>
+  <text x="114" y="86" text-anchor="middle" font-size="10" fill="#3020a0">2 Players: A vs B</text>
+
+  <rect x="192" y="68" width="150" height="28" rx="14" fill="#ddd8f5" stroke="#a090d0" stroke-width="1"/>
+  <text x="267" y="86" text-anchor="middle" font-size="10" fill="#3020a0">Main + Side Quest</text>
+
+  <rect x="356" y="68" width="152" height="28" rx="14" fill="#ddd8f5" stroke="#a090d0" stroke-width="1"/>
+  <text x="432" y="86" text-anchor="middle" font-size="10" fill="#3020a0">10 Alternating Turns</text>
+
+  <rect x="522" y="68" width="186" height="28" rx="14" fill="#ddd8f5" stroke="#a090d0" stroke-width="1"/>
+  <text x="615" y="86" text-anchor="middle" font-size="10" fill="#3020a0">Structured Intent per Turn</text>
+
+  <rect x="722" y="68" width="186" height="28" rx="14" fill="#ddd8f5" stroke="#a090d0" stroke-width="1"/>
+  <text x="815" y="86" text-anchor="middle" font-size="10" fill="#3020a0">Ending Evaluated at Turn 10</text>
+
+  <rect x="922" y="68" width="128" height="28" rx="14" fill="#ddd8f5" stroke="#a090d0" stroke-width="1"/>
+  <text x="986" y="86" text-anchor="middle" font-size="10" fill="#3020a0">Side Quest Bonus</text>
+
+  <!-- ======== MAIN SECTIONS  y=120, h=300 ======== -->
+
+  <!-- Section 1: Player Interaction  x=30, w=155 -->
+  <rect x="30"  y="120" width="155" height="300" rx="10" fill="#e8f2fc" stroke="#a0c0e0" stroke-width="1.5"/>
+  <path d="M40,120 L175,120 Q185,120 185,130 L185,160 L30,160 L30,130 Q30,120 40,120 Z" fill="#4a7fb5"/>
+  <text x="107" y="144" text-anchor="middle" font-size="11" font-weight="700" fill="white">Player Interaction</text>
+
+  <circle cx="47" cy="185" r="3" fill="#4a7fb5"/>
+  <text x="56"  y="189" font-size="10.5" fill="#1a3a5a">Quest Cards</text>
+
+  <circle cx="47" cy="207" r="3" fill="#4a7fb5"/>
+  <text x="56"  y="211" font-size="10.5" fill="#1a3a5a">Text / Voice Input</text>
+
+  <!-- intent.md pill -->
+  <rect x="40" y="222" width="133" height="38" rx="8" fill="#bad4f0" stroke="#4a7fb5" stroke-width="2"/>
+  <text x="106" y="237" text-anchor="middle" font-size="12" font-weight="700" fill="#0a2060">intent.md</text>
+  <text x="106" y="251" text-anchor="middle" font-size="8.5" fill="#2a4080">structured player input</text>
+
+  <circle cx="47" cy="278" r="3" fill="#4a7fb5"/>
+  <text x="56"  y="282" font-size="10.5" fill="#1a3a5a">Scene Direction</text>
+
+  <circle cx="47" cy="300" r="3" fill="#4a7fb5"/>
+  <text x="56"  y="304" font-size="10.5" fill="#1a3a5a">Inspiration Card</text>
+
+  <circle cx="47" cy="322" r="3" fill="#4a7fb5"/>
+  <text x="56"  y="326" font-size="10.5" fill="#1a3a5a">Tone &amp; Constraints</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="186" y1="270" x2="208" y2="270" stroke="#9090b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Section 2: Intent Structuring  x=210, w=165 -->
+  <rect x="210" y="120" width="165" height="300" rx="10" fill="#edeafc" stroke="#b0a0d8" stroke-width="1.5"/>
+  <path d="M220,120 L365,120 Q375,120 375,130 L375,160 L210,160 L210,130 Q210,120 220,120 Z" fill="#6b5db5"/>
+  <text x="292" y="144" text-anchor="middle" font-size="11" font-weight="700" fill="white">Intent Structuring</text>
+
+  <circle cx="227" cy="185" r="3" fill="#6b5db5"/>
+  <text x="236"  y="189" font-size="10.5" fill="#2a1a5a">Scene Direction</text>
+
+  <circle cx="227" cy="207" r="3" fill="#6b5db5"/>
+  <text x="236"  y="211" font-size="10.5" fill="#2a1a5a">Inspiration Card</text>
+
+  <circle cx="227" cy="229" r="3" fill="#6b5db5"/>
+  <text x="236"  y="233" font-size="10.5" fill="#2a1a5a">Constraints &amp; Rules</text>
+
+  <!-- Structured Intent JSON box -->
+  <rect x="220" y="248" width="148" height="40" rx="8" fill="#ccc8f5" stroke="#6b5db5" stroke-width="2"/>
+  <text x="294" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#1a0a60">Structured Intent JSON</text>
+  <text x="294" y="279" text-anchor="middle" font-size="8.5" fill="#3a2a80">shared control layer</text>
+
+  <circle cx="227" cy="311" r="3" fill="#6b5db5"/>
+  <text x="236"  y="315" font-size="10.5" fill="#2a1a5a">Goal Framing</text>
+
+  <circle cx="227" cy="333" r="3" fill="#6b5db5"/>
+  <text x="236"  y="337" font-size="10.5" fill="#2a1a5a">Credibility State</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="376" y1="270" x2="398" y2="270" stroke="#9090b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Section 3: Narrative Orchestration  x=400, w=200 -->
+  <rect x="400" y="120" width="200" height="300" rx="10" fill="#e2f5f1" stroke="#90d0c0" stroke-width="1.5"/>
+  <path d="M410,120 L590,120 Q600,120 600,130 L600,160 L400,160 L400,130 Q400,120 410,120 Z" fill="#2d8b77"/>
+  <text x="500" y="144" text-anchor="middle" font-size="11" font-weight="700" fill="white">Narrative Orchestration</text>
+
+  <circle cx="417" cy="185" r="3" fill="#2d8b77"/>
+  <text x="426"  y="189" font-size="10.5" fill="#0a3a2a">Gemini GM · Turn Resolver</text>
+
+  <circle cx="417" cy="207" r="3" fill="#2d8b77"/>
+  <text x="426"  y="211" font-size="10.5" fill="#0a3a2a">Story State Loader</text>
+
+  <circle cx="417" cy="229" r="3" fill="#2d8b77"/>
+  <text x="426"  y="233" font-size="10.5" fill="#0a3a2a">Intent Compiler</text>
+
+  <circle cx="417" cy="251" r="3" fill="#2d8b77"/>
+  <text x="426"  y="255" font-size="10.5" fill="#0a3a2a">Narrative Intent Guardrail</text>
+
+  <!-- Prompt Builder box -->
+  <rect x="410" y="268" width="178" height="38" rx="8" fill="#b0e0d8" stroke="#2d8b77" stroke-width="1.5"/>
+  <text x="499" y="284" text-anchor="middle" font-size="10.5" font-weight="600" fill="#0a3828">Prompt Builder</text>
+  <text x="499" y="298" text-anchor="middle" font-size="8.5" fill="#1a4838">history · intent · cast table</text>
+
+  <circle cx="417" cy="326" r="3" fill="#2d8b77"/>
+  <text x="426"  y="330" font-size="10.5" fill="#0a3a2a">Candidate Selection (×3)</text>
+
+  <circle cx="417" cy="348" r="3" fill="#2d8b77"/>
+  <text x="426"  y="352" font-size="10.5" fill="#0a3a2a">CastTable · Visual Canon</text>
+
+  <!-- Arrow 3→4 -->
+  <line x1="601" y1="270" x2="623" y2="270" stroke="#9090b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Section 4: Multimodal Generation  x=625, w=165 -->
+  <rect x="625" y="120" width="165" height="300" rx="10" fill="#e4f5e7" stroke="#90c898" stroke-width="1.5"/>
+  <path d="M635,120 L780,120 Q790,120 790,130 L790,160 L625,160 L625,130 Q625,120 635,120 Z" fill="#3a8c4a"/>
+  <text x="707" y="144" text-anchor="middle" font-size="11" font-weight="700" fill="white">Multimodal Generation</text>
+
+  <circle cx="642" cy="185" r="3" fill="#3a8c4a"/>
+  <text x="651"  y="189" font-size="10.5" fill="#0a3010">Story Text</text>
+
+  <rect x="635" y="200" width="143" height="38" rx="7" fill="#b8e0c0" stroke="#3a8c4a" stroke-width="1.5"/>
+  <text x="706" y="215" text-anchor="middle" font-size="10.5" font-weight="600" fill="#0a3010">Scene Image</text>
+  <text x="706" y="230" text-anchor="middle" font-size="8.5" fill="#1a4020">Gemini image gen</text>
+
+  <rect x="635" y="248" width="143" height="38" rx="7" fill="#b8e0c0" stroke="#3a8c4a" stroke-width="1.5"/>
+  <text x="706" y="263" text-anchor="middle" font-size="10.5" font-weight="600" fill="#0a3010">Motion Clip</text>
+  <text x="706" y="278" text-anchor="middle" font-size="8.5" fill="#1a4020">Veo 2 · hover play</text>
+
+  <circle cx="642" cy="308" r="3" fill="#3a8c4a"/>
+  <text x="651"  y="312" font-size="10.5" fill="#0a3010">Visual Brief</text>
+
+  <circle cx="642" cy="330" r="3" fill="#3a8c4a"/>
+  <text x="651"  y="334" font-size="10.5" fill="#0a3010">CastTable Canon</text>
+
+  <!-- Arrow 4→5 -->
+  <line x1="791" y1="270" x2="813" y2="270" stroke="#9090b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Section 5: Outcome Evaluation  x=815, w=255 -->
+  <rect x="815" y="120" width="255" height="300" rx="10" fill="#fdf2e2" stroke="#e0c090" stroke-width="1.5"/>
+  <path d="M825,120 L1060,120 Q1070,120 1070,130 L1070,160 L815,160 L815,130 Q815,120 825,120 Z" fill="#c47a28"/>
+  <text x="942" y="144" text-anchor="middle" font-size="11" font-weight="700" fill="white">Outcome Evaluation</text>
+
+  <circle cx="832" cy="185" r="3" fill="#c47a28"/>
+  <text x="841"  y="189" font-size="10.5" fill="#4a2808">Momentum Update (first)</text>
+
+  <circle cx="832" cy="207" r="3" fill="#c47a28"/>
+  <text x="841"  y="211" font-size="10.5" fill="#4a2808">Progress Update (second)</text>
+
+  <circle cx="832" cy="229" r="3" fill="#c47a28"/>
+  <text x="841"  y="233" font-size="10.5" fill="#4a2808">Normal vs Final Move</text>
+
+  <rect x="824" y="248" width="115" height="38" rx="7" fill="#f5d8a8" stroke="#c47a28" stroke-width="1.5"/>
+  <text x="881" y="263" text-anchor="middle" font-size="10" font-weight="600" fill="#4a2808">Ending Evaluator</text>
+  <text x="881" y="278" text-anchor="middle" font-size="8.5" fill="#5a3810">Ending A or B</text>
+
+  <rect x="949" y="248" width="115" height="38" rx="7" fill="#f5d8a8" stroke="#c47a28" stroke-width="1.5"/>
+  <text x="1006" y="263" text-anchor="middle" font-size="10" font-weight="600" fill="#4a2808">Side Quest Check</text>
+  <text x="1006" y="278" text-anchor="middle" font-size="8.5" fill="#5a3810">one-time bonus</text>
+
+  <circle cx="832" cy="310" r="3" fill="#c47a28"/>
+  <text x="841"  y="314" font-size="10.5" fill="#4a2808">Streak + Phase</text>
+
+  <circle cx="832" cy="332" r="3" fill="#c47a28"/>
+  <text x="841"  y="336" font-size="10.5" fill="#4a2808">Credibility Decay</text>
+
+  <!-- ======== DATA LAYER BAND ======== -->
+  <rect x="30" y="432" width="1040" height="55" rx="10" fill="#f0f0f8" stroke="#b0b0d0" stroke-width="1.5"/>
+  <text x="50" y="450" font-size="8.5" font-weight="700" fill="#5050a0" letter-spacing="1.5">DATA LAYER</text>
+
+  <rect x="50"  y="456" width="165" height="24" rx="7" fill="#dcdcf0" stroke="#a0a0c8" stroke-width="1"/>
+  <text x="132" y="472" text-anchor="middle" font-size="10" fill="#303080">Session State</text>
+
+  <rect x="228" y="456" width="165" height="24" rx="7" fill="#dcdcf0" stroke="#a0a0c8" stroke-width="1"/>
+  <text x="310" y="472" text-anchor="middle" font-size="10" fill="#303080">Turn History</text>
+
+  <rect x="406" y="456" width="165" height="24" rx="7" fill="#dcdcf0" stroke="#a0a0c8" stroke-width="1"/>
+  <text x="488" y="472" text-anchor="middle" font-size="10" fill="#303080">Fact Ledger</text>
+
+  <rect x="584" y="456" width="165" height="24" rx="7" fill="#dcdcf0" stroke="#a0a0c8" stroke-width="1"/>
+  <text x="666" y="472" text-anchor="middle" font-size="10" fill="#303080">Media Assets</text>
+
+  <rect x="762" y="456" width="140" height="24" rx="7" fill="#dcdcf0" stroke="#a0a0c8" stroke-width="1"/>
+  <text x="832" y="472" text-anchor="middle" font-size="10" fill="#303080">Story Packs</text>
+
+  <rect x="915" y="456" width="145" height="24" rx="7" fill="#dcdcf0" stroke="#a0a0c8" stroke-width="1"/>
+  <text x="987" y="472" text-anchor="middle" font-size="10" fill="#303080">Socket Rooms</text>
+
+</svg>
