@@ -1,0 +1,10 @@
+.claude/
+node_modules/
+build/
+dist/
+coverage/
+generated/
+.DS_Store
+*.log
+.env*
+!.env.example

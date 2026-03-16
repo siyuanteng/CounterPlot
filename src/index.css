@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito+Sans:wght@400;500;600;700;900&display=swap');
+@import "tailwindcss";
+
+/* Themed scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #0a0806; }
+::-webkit-scrollbar-thumb { background: #4a3320; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #8a6331; }
+* { scrollbar-width: thin; scrollbar-color: #4a3320 #0a0806; }
+
+@theme {
+  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cinzel Decorative", serif;
+  --animate-fade-in: fade-in 0.5s ease-out forwards;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
